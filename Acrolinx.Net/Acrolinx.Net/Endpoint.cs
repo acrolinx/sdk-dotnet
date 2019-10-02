@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Net.Http;
@@ -128,7 +129,6 @@ namespace Acrolinx.Net
         {
             try
             {
-
                 var obj = await FetchDataFromApiPath<SignInResponse>("auth/sign-ins", HttpMethod.Post,
                     null,
                     new Dictionary<string, string>(){
@@ -176,6 +176,12 @@ namespace Acrolinx.Net
                 }
                 Thread.Sleep(result.Progress.RetryAfter * 1000);
             }
+        }
+
+        public async Task<string> GetContentAnalysisDashboard(AccessToken accessToken, string batchId)
+        {
+            var result = await FetchDataFromApiPath<ContentAnalysisDashboard>($"checking/{batchId}/contentanalysis", HttpMethod.Get, accessToken, null, null);
+            return result.Data.Links.FirstOrDefault(r => r.LinkType == "shortWithoutAccessToken")?.Link;
         }
 
         public async Task<CheckResult> Check(AccessToken accessToken, CheckRequest checkRequest)

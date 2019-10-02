@@ -59,8 +59,11 @@
     <Compile Include="Check\CheckPollResponse.cs" />
     <Compile Include="Check\CheckResult.cs" />
     <Compile Include="Check\CheckType.cs" />
+    <Compile Include="Check\ContentAnalysisDashboard.cs" />
+    <Compile Include="Check\ContentAnalysisDashboardLinks.cs" />
     <Compile Include="Check\CustomField.cs" />
     <Compile Include="Check\DocumentDescriptorRequest.cs" />
+    <Compile Include="Check\ContentAnalysisDashboardLink.cs" />
     <Compile Include="Check\Quality.cs" />
     <Compile Include="Check\Report.cs" />
     <Compile Include="Check\ReportType.cs" />
@@ -75,6 +78,7 @@
     <Compile Include="Check\CheckResponse.cs" />
     <Compile Include="Internal\SuccessResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\BatchCheckIdGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

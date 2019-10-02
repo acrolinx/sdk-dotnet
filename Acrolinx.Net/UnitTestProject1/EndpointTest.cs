@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Acrolinx.Net.Acrolinx.Net;
 using Acrolinx.Net.Check;
 using Acrolinx.Net.Exceptions;
+using Acrolinx.Net.Utils;
 
 namespace Acrolinx.Net.Tests
 {
@@ -154,7 +155,19 @@ namespace Acrolinx.Net.Tests
             Assert.IsTrue(checkResult.Reports.ContainsKey("scorecard"));
         }
 
-        private async Task<CheckResponse> SubmitCheck(AccessToken accessToken,  CheckRequest checkRequest)
+        [TestMethod]
+        public async Task TestContentAnalysis()
+        {
+            CreateEndpoint();
+            var accessToken = await GetAccessToken();
+
+            var batchId = BatchCheckIdGenerator.GenerateId("NetSDKTest");
+            var result = await endpoint.GetContentAnalysisDashboard(accessToken, batchId);
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.StartsWith(TestEnvironment.AcrolinxUrl));
+        }
+
+        private async Task<CheckResponse> SubmitCheck(AccessToken accessToken, CheckRequest checkRequest)
         {
             return await endpoint.SubmitCheck(accessToken, checkRequest);
         }
@@ -163,5 +176,7 @@ namespace Acrolinx.Net.Tests
         {
             endpoint = TestEnvironment.CreateEndpoint();
         }
+
+
     }
 }
