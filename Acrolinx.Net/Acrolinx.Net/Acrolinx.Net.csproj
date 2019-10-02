@@ -53,17 +53,33 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessToken.cs" />
+    <Compile Include="Check\CheckOptions.cs" />
+    <Compile Include="Check\CheckRequest.cs" />
+    <Compile Include="Check\CheckResponseData.cs" />
+    <Compile Include="Check\CheckPollResponse.cs" />
+    <Compile Include="Check\CheckResult.cs" />
+    <Compile Include="Check\CheckType.cs" />
+    <Compile Include="Check\CustomField.cs" />
+    <Compile Include="Check\DocumentDescriptorRequest.cs" />
+    <Compile Include="Check\Quality.cs" />
+    <Compile Include="Check\Report.cs" />
+    <Compile Include="Check\ReportType.cs" />
+    <Compile Include="Check\Status.cs" />
     <Compile Include="Endpoint.cs" />
     <Compile Include="Exceptions\ApiException.cs" />
     <Compile Include="Exceptions\AcrolinxException.cs" />
     <Compile Include="Exceptions\SsoFailedException.cs" />
+    <Compile Include="Internal\Progress.cs" />
+    <Compile Include="Internal\SignInResponse.cs" />
     <Compile Include="Internal\SignInSuccess.cs" />
+    <Compile Include="Check\CheckResponse.cs" />
     <Compile Include="Internal\SuccessResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
