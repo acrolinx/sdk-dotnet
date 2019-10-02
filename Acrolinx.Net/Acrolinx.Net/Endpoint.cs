@@ -177,5 +177,11 @@ namespace Acrolinx.Net
                 Thread.Sleep(result.Progress.RetryAfter * 1000);
             }
         }
+
+        public async Task<CheckResult> Check(AccessToken accessToken, CheckRequest checkRequest)
+        {
+            var checkResponse = await SubmitCheck(accessToken, checkRequest);
+            return await GetCheckResult(accessToken, checkResponse);
+        }
     }
 }
