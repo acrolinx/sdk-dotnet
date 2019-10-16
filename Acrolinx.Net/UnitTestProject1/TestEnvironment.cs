@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +17,16 @@ namespace Acrolinx.Net.Tests
         }
 
         public static string SsoToken
-            {
+        {
             get
             {
-                return Environment.GetEnvironmentVariable("ACROLINX_API_SSO_TOKEN");
+                var token = Environment.GetEnvironmentVariable("ACROLINX_API_SSO_TOKEN");
+
+                if (token == null) {
+                    Trace.TraceWarning("ACROLINX_API_SSO_TOKEN is unset");
+                }
+
+                return token;
             }
         }
 
