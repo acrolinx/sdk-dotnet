@@ -23,7 +23,7 @@ namespace Acrolinx.Net.Tests
                 var token = Environment.GetEnvironmentVariable("ACROLINX_API_SSO_TOKEN");
 
                 if (token == null) {
-                    Trace.TraceWarning("ACROLINX_API_SSO_TOKEN is unset");
+                    Trace.WriteLine("ACROLINX_API_SSO_TOKEN is unset");
                 }
 
                 return token;
