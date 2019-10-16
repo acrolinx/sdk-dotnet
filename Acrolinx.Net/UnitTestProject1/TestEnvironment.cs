@@ -30,7 +30,8 @@ namespace Acrolinx.Net.Tests
                 var url = Environment.GetEnvironmentVariable("ACROLINX_API_URL");
                 if (string.IsNullOrWhiteSpace(url))
                 {
-                    return "https://test-ssl.acrolinx.com";
+                    return "https://test-latest-ssl.acrolinx.com";
+                    //return "https://test-ssl.acrolinx.com";
                 }
                 return url;
             }

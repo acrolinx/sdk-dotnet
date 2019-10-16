@@ -77,12 +77,8 @@ namespace Acrolinx.Net
 
             if (response.IsSuccessStatusCode)
             {
-                //return (await response.Content.ReadAsAsync<SuccessResponse<T>>()).data;
                 var json = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<T>(json);
-                //JObject obj = JObject.Parse(json);
-
-                //return obj;
             }
             throw new LowLevelApiException(await response.Content.ReadAsStringAsync());
         }
@@ -136,7 +132,7 @@ namespace Acrolinx.Net
                     { "password", genericToken }
                     },
                     null);
-                if (obj.Links.ContainsKey("Poll"))
+                if (obj.Links.ContainsKey("poll"))
                 {
                     throw new SsoFailedException("" + obj);
                 }
