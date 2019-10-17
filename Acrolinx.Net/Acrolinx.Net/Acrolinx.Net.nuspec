@@ -15,7 +15,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
 
     <dependencies>
-      <group targetFrameowork=".NETFramework4.5" />
+      <group targetFramework=".NETFramework4.5" />
     </dependencies>
   </metadata>
 
