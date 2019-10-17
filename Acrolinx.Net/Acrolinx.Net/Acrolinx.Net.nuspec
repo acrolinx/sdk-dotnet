@@ -15,8 +15,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
 
     <dependencies>
-      <dependency id="Microsoft.AspNet.WebApi.Client" version="5.2.7" />
-      <dependency id="Newtonsoft.Json" version="12.0.2" />
+      <group targetFrameowork=".NETFramework4.5" />
     </dependencies>
   </metadata>
 
