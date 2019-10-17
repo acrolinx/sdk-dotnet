@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Acrolinx .NET SDK")]
-[assembly: AssemblyDescription("Acrolinx .NET SDK")]
+[assembly: AssemblyTitle(".NET SDK for working with Acrolinx (without Sidebar)")]
+[assembly: AssemblyDescription(".NET SDK for working with Acrolinx (without Sidebar)")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Acrolinx GmbH")]
-[assembly: AssemblyProduct("Acrolinx .NET SDK")]
+[assembly: AssemblyProduct(".NET SDK for working with Acrolinx (without Sidebar)")]
 [assembly: AssemblyCopyright("© 2019 Acrolinx GmbH")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
