@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
 
-    <!-- TODO: Version? -->
+    <Version>1.0.0.0</Version>
     <Authors>Acrolinx</Authors>
     <Description>.NET SDK for working with Acrolinx (without Sidebar)</Description>
     <Copyright>© 2019 Acrolinx GmbH</Copyright>
@@ -97,15 +97,20 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="MSBuild.Extension.Pack" Version="1.9.1" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+
+  <ItemGroup>
+    <AssemblyInfoFiles Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
   <Target Name="BeforeBuild">
+    <MSBuild.ExtensionPack.Framework.AssemblyInfo
+      AssemblyInfoFiles="@(AssemblyInfoFiles)"
+      AssemblyFileVersion="$(Version)"
+      AssemblyVersion="$(Version)"
+    />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
 
 <!-- vim: set ts=2 sw=2 et: -->
