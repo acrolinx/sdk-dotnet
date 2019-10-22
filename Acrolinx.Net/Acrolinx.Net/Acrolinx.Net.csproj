@@ -16,7 +16,7 @@
     <Version>1.0.0.0</Version>
     <Authors>Acrolinx</Authors>
     <Description>.NET SDK for working with Acrolinx (without Sidebar)</Description>
-    <Copyright>© 2019 Acrolinx GmbH</Copyright>
+    <Copyright>© 2019 - present Acrolinx GmbH</Copyright>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/acrolinx/sdk-dotnet</PackageProjectUrl>
     <PackageIcon>content/images/nugetIcon.png</PackageIcon>

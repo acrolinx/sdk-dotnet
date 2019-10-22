@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Acrolinx GmbH")]
 [assembly: AssemblyProduct(".NET SDK for working with Acrolinx (without Sidebar)")]
-[assembly: AssemblyCopyright("© 2019 Acrolinx GmbH")]
+[assembly: AssemblyCopyright("© 2019 - present Acrolinx GmbH")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
