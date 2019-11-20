@@ -12,7 +12,6 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-
     <Version>1.0.0.0</Version>
     <Authors>Acrolinx</Authors>
     <Description>.NET SDK for working with Acrolinx (without Sidebar)</Description>
@@ -69,7 +68,7 @@
     <Compile Include="Check\Report.cs" />
     <Compile Include="Check\ReportType.cs" />
     <Compile Include="Check\Status.cs" />
-    <Compile Include="Endpoint.cs" />
+    <Compile Include="AcrolinxEndpoint.cs" />
     <Compile Include="Exceptions\ApiException.cs" />
     <Compile Include="Exceptions\AcrolinxException.cs" />
     <Compile Include="Exceptions\SsoFailedException.cs" />
@@ -102,17 +101,11 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-
   <ItemGroup>
     <AssemblyInfoFiles Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Target Name="BeforeBuild">
-    <MSBuild.ExtensionPack.Framework.AssemblyInfo
-      AssemblyInfoFiles="@(AssemblyInfoFiles)"
-      AssemblyFileVersion="$(Version)"
-      AssemblyVersion="$(Version)"
-    />
+    <MSBuild.ExtensionPack.Framework.AssemblyInfo AssemblyInfoFiles="@(AssemblyInfoFiles)" AssemblyFileVersion="$(Version)" AssemblyVersion="$(Version)" />
   </Target>
 </Project>
-
 <!-- vim: set ts=2 sw=2 et: -->
