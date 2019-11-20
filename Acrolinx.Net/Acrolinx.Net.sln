@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acrolinx.Net", "Acrolinx.Net\Acrolinx.Net.csproj", "{B97F26D4-909B-4093-A9BA-E436A4842569}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acrolinx.Net.Tests", "UnitTestProject1\Acrolinx.Net.Tests.csproj", "{61A6F6BF-1B80-4941-AEFD-8C9A9BFDA56E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Acrolinx.Net.Tests", "Acrolinx.Net.Tests\Acrolinx.Net.Tests.csproj", "{61A6F6BF-1B80-4941-AEFD-8C9A9BFDA56E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
