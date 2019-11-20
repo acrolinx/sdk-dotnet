@@ -67,7 +67,6 @@ namespace Acrolinx.Net.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public async Task TestSsoFailDueToMissingMetadata()
         {
             CreateEndpoint();
