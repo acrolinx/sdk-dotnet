@@ -55,7 +55,7 @@ See [EndpointTest.java](Acrolinx.Net/Acrolinx.Net.Tests/EndpointTest.cs) for mor
 
 1. **Authenticate via SSO or API token** -
    See: [Authentication in Coding Guidance](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/configuration.md#authentication)
-2. **Check** - Check documents, set all relevant parameters, and submit document content, access high-level results like Acrolinx Score - See [Text Extraction](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/text-extraction.md)
+2. **Check** - Check documents, set all relevant parameters, and submit document content, access high-level results like Acrolinx Score - See: [Text Extraction](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/text-extraction.md)
 3. **Content Analysis Dashboard** - Aggregate all results to one dashboard
 
 ## License
