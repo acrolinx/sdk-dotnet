@@ -20,6 +20,9 @@ using Acrolinx.Net.Acrolinx.Net;
 using Acrolinx.Net.Check;
 using Acrolinx.Net.Exceptions;
 using Acrolinx.Net.Utils;
+using Moq;
+using System.Threading;
+using System;
 
 namespace Acrolinx.Net.Tests
 {
@@ -34,16 +37,6 @@ namespace Acrolinx.Net.Tests
             CreateEndpoint();
             Assert.IsNotNull(endpoint);
         }
-
-
-        //[TestMethod]
-        //public async Task TestInfo()
-        //{
-        //    CreateEndpoint();
-        //    dynamic info = await endpoint.GetPlatformInformation();
-
-        //    Assert.AreEqual("Acrolinx Core Platform", "" + info.server.name);
-        //}
 
         [TestMethod]
         public async Task TestSso()
@@ -92,6 +85,40 @@ namespace Acrolinx.Net.Tests
 
             Assert.Fail("SsoFailedException not thrown");
         }
+
+        [TestMethod]
+        [Timeout(3000)]
+        public void TestSignInInteractiveHasPollUrl()
+        {
+            CreateEndpoint();
+            var openUrlMock = new Mock<AcrolinxEndpoint.OpenUrl>();
+            var signIn = endpoint.SignInInteractive(openUrlMock.Object);
+            Thread.Sleep(2000);
+            openUrlMock.Verify(_ => _(It.IsAny<Uri>()), Times.Once);
+        }
+
+        [TestMethod]
+        [Timeout(5000)]
+        [ExpectedException(typeof(SignInFailedException), "Timeout")]
+        public async Task TestSignInInteractiveTimeout()
+        {
+            CreateEndpoint();
+            await endpoint.SignInInteractive((url)=> { }, new TimeSpan(0,0,1));
+        }
+
+        [TestMethod]
+        [Timeout(1 * 60 * 1000)]
+        [Ignore]
+        public async Task ManualTestSignInInteractive()
+        {
+            CreateEndpoint();
+            AccessToken accessToken = await endpoint.SignInInteractive((url) => {
+                System.Diagnostics.Trace.WriteLine("Sign in manually in browser please: " + url);                
+                System.Diagnostics.Process.Start(url.ToString()); });
+            System.Diagnostics.Trace.WriteLine("The AccessToken is: " + accessToken.Token);
+            Assert.IsTrue(!string.IsNullOrEmpty(accessToken.Token));
+        }
+        
 
         [TestMethod]
         public async Task TestSubmitCheck()

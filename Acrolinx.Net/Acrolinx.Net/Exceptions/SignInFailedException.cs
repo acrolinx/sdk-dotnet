@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2019-present Acrolinx GmbH
+ * Copyright 2020-present Acrolinx GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-using System.Collections.Generic;
+using System;
 
-namespace Acrolinx.Net.Internal
+namespace Acrolinx.Net.Exceptions
 {
-    public class SignInResponse
+    public class SignInFailedException : AcrolinxException
     {
-        public SignInSuccess Data { get; set; }
-        public Dictionary<string, string> Links { get; set; }
-
-        public Progress Progress { get; set; }
-
+        public SignInFailedException(string message) : base(message) { }
+        public SignInFailedException(string message, Exception e) : base(message, e) { }
     }
 }

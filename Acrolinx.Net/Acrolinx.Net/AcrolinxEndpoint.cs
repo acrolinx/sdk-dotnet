@@ -34,6 +34,8 @@ namespace Acrolinx.Net
 {
     public class AcrolinxEndpoint
     {
+        public delegate void OpenUrl(Uri uri);
+
         private string acrolinxUrl;
         private string clientLocale = "";
         private string clientSignature;
@@ -129,12 +131,6 @@ namespace Acrolinx.Net
             headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        //public async Task<dynamic> GetPlatformInformation()
-        //{
-        //    dynamic obj = await FetchDataFromApiPath("", HttpMethod.Get, null, null, null);
-        //    return obj.data;
-        //}
-
         public async Task<AccessToken> SignInWithSSO(string genericToken, string username)
         {
             try
@@ -155,6 +151,50 @@ namespace Acrolinx.Net
             catch (LowLevelApiException e)
             {
                 throw new SsoFailedException(e.Message, e);
+            }
+        }
+        public async Task<AccessToken> SignInInteractive(OpenUrl openUrl)
+        {
+            return await SignInInteractive(openUrl, new TimeSpan(0, 30, 0));
+        }
+         
+        public async Task<AccessToken> SignInInteractive(OpenUrl openUrl, TimeSpan timeout)
+        {
+            try
+            {
+                var obj = await FetchDataFromApiPath<SignInResponse>("auth/sign-ins", HttpMethod.Post,
+                    null,null , null);
+                if (obj.Links.ContainsKey("poll"))
+                {
+                    var url = obj.Links["interactive"];
+                    if (!(url.ToLower().StartsWith("http://") || url.ToLower().StartsWith("https://") || url.ToLower().StartsWith("mailto:") || url.ToLower().StartsWith("www.")))
+                    {
+                        throw new SignInFailedException("Ignoring URL: '" + url + "'. It seems not to be a valid URL.");
+                    }
+
+                    openUrl?.Invoke(new Uri(url));
+
+                    var pollUrl = obj.Links["poll"];
+                    var start = DateTime.Now;
+                    while (DateTime.Now - start < timeout)
+                    {
+                        var poll = await FetchDataFromApiPath<SignInResponse>(pollUrl, HttpMethod.Get, null, null, null);
+                        if (!string.IsNullOrEmpty(poll.Data?.AccessToken)){
+                            return new AccessToken(poll.Data.AccessToken);
+                        }
+                        Thread.Sleep(poll.Progress.RetryAfter * 1000);
+                    }
+                    throw new SignInFailedException("Timeout");
+                }
+                else
+                {
+                    return new AccessToken(obj.Data.AccessToken);
+                }
+
+            }
+            catch (LowLevelApiException e)
+            {
+                throw new SignInFailedException(e.Message, e);
             }
         }
 
