@@ -155,15 +155,20 @@ namespace Acrolinx.Net
         }
         public async Task<AccessToken> SignInInteractive(OpenUrl openUrl)
         {
-            return await SignInInteractive(openUrl, new TimeSpan(0, 30, 0));
+            return await SignInInteractive(openUrl, null);
         }
-         
-        public async Task<AccessToken> SignInInteractive(OpenUrl openUrl, TimeSpan timeout)
+
+        public async Task<AccessToken> SignInInteractive(OpenUrl openUrl, AccessToken token)
+        {
+            return await SignInInteractive(openUrl, new TimeSpan(0, 30, 0), token);
+        }
+
+
+        public async Task<AccessToken> SignInInteractive(OpenUrl openUrl, TimeSpan timeout, AccessToken token)
         {
             try
             {
-                var obj = await FetchDataFromApiPath<SignInResponse>("auth/sign-ins", HttpMethod.Post,
-                    null,null , null);
+                var obj = await FetchDataFromApiPath<SignInResponse>("auth/sign-ins", HttpMethod.Post, token, null, null);
                 if (obj.Links.ContainsKey("poll"))
                 {
                     var url = obj.Links["interactive"];
@@ -176,7 +181,10 @@ namespace Acrolinx.Net
 
                     var pollUrl = obj.Links["poll"];
                     var start = DateTime.Now;
-                    while (DateTime.Now - start < timeout)
+
+                    TimeSpan minimalTimeout = obj.Data?.InteractiveLinkTimeout <= 0 ? timeout : 
+                        new TimeSpan(Math.Min(new TimeSpan(0, 0, obj.Data.InteractiveLinkTimeout).Ticks, timeout.Ticks));
+                    while (DateTime.Now - start < minimalTimeout)
                     {
                         var poll = await FetchDataFromApiPath<SignInResponse>(pollUrl, HttpMethod.Get, null, null, null);
                         if (!string.IsNullOrEmpty(poll.Data?.AccessToken)){

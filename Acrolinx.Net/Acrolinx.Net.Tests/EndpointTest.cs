@@ -103,7 +103,7 @@ namespace Acrolinx.Net.Tests
         public async Task TestSignInInteractiveTimeout()
         {
             CreateEndpoint();
-            await endpoint.SignInInteractive((url)=> { }, new TimeSpan(0,0,1));
+            await endpoint.SignInInteractive((url)=> { }, new TimeSpan(0,0,1), null);
         }
 
         [TestMethod]
@@ -139,6 +139,58 @@ namespace Acrolinx.Net.Tests
 
             Assert.IsNotNull(checkResponse);
             Assert.IsTrue((checkResponse.Links.ContainsKey("result")));
+        }
+
+        [TestMethod]
+        [Timeout(4 * 1000)]
+        public async Task TestSignInInteractiveWithTokenUsesTokenWithoutUserInteraction()
+        {
+            CreateEndpoint();
+            var accessToken = await GetAccessToken();
+
+            bool interactiveCalled = false;
+            AccessToken accessToken2 = await endpoint.SignInInteractive((_)=> { interactiveCalled = true; }, accessToken);
+
+            Assert.IsFalse(interactiveCalled);
+            Assert.AreEqual(accessToken?.Token, accessToken2?.Token);
+        }
+
+        [TestMethod]
+        [Timeout(10 * 1000)]
+        public async Task TestSignInInteractiveWithInvalidTokenFallsBackToInteractive()
+        {
+            CreateEndpoint();
+            var accessToken = new AccessToken("invalid");
+
+            bool interactiveCalled = false;
+            try
+            {
+                AccessToken accessToken2 = await endpoint.SignInInteractive((_) => { interactiveCalled = true; }, new TimeSpan(0, 0, 2), accessToken);
+            }
+            catch (SignInFailedException e)
+            {
+                Assert.AreEqual("Timeout", e.Message);
+            }
+
+            Assert.IsTrue(interactiveCalled);
+        }
+
+        [TestMethod]
+        [Timeout(10 * 1000)]
+        public async Task TestSignInInteractiveWithInvalidTokenFallsBackToInteractive2()
+        {
+            CreateEndpoint();
+
+            bool interactiveCalled = false;
+            try{
+                AccessToken accessToken2 = await endpoint.SignInInteractive((_) => { interactiveCalled = true; }, new TimeSpan(0, 0, 4), null);
+            }
+            catch (SignInFailedException e)
+            {
+                Assert.AreEqual("Timeout", e.Message);
+            }
+
+            Assert.IsTrue(interactiveCalled);
         }
 
         [TestMethod]
