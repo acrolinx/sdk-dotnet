@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using Acrolinx.Net.Acrolinx.Net;
 using Acrolinx.Net.Check;
@@ -103,7 +103,7 @@ namespace Acrolinx.Net.Tests
         public async Task TestSignInInteractiveTimeout()
         {
             CreateEndpoint();
-            await endpoint.SignInInteractive((url)=> { }, new TimeSpan(0,0,1), null);
+            await endpoint.SignInInteractive((url) => { }, new TimeSpan(0, 0, 1), null);
         }
 
         [TestMethod]
@@ -112,13 +112,15 @@ namespace Acrolinx.Net.Tests
         public async Task ManualTestSignInInteractive()
         {
             CreateEndpoint();
-            AccessToken accessToken = await endpoint.SignInInteractive((url) => {
-                System.Diagnostics.Trace.WriteLine("Sign in manually in browser please: " + url);                
-                System.Diagnostics.Process.Start(url.ToString()); });
+            AccessToken accessToken = await endpoint.SignInInteractive((url) =>
+            {
+                System.Diagnostics.Trace.WriteLine("Sign in manually in browser please: " + url);
+                System.Diagnostics.Process.Start(url.ToString());
+            });
             System.Diagnostics.Trace.WriteLine("The AccessToken is: " + accessToken.Token);
             Assert.IsTrue(!string.IsNullOrEmpty(accessToken.Token));
         }
-        
+
 
         [TestMethod]
         public async Task TestSubmitCheck()
@@ -149,7 +151,7 @@ namespace Acrolinx.Net.Tests
             var accessToken = await GetAccessToken();
 
             bool interactiveCalled = false;
-            AccessToken accessToken2 = await endpoint.SignInInteractive((_)=> { interactiveCalled = true; }, accessToken);
+            AccessToken accessToken2 = await endpoint.SignInInteractive((_) => { interactiveCalled = true; }, accessToken);
 
             Assert.IsFalse(interactiveCalled);
             Assert.AreEqual(accessToken?.Token, accessToken2?.Token);
@@ -182,7 +184,8 @@ namespace Acrolinx.Net.Tests
             CreateEndpoint();
 
             bool interactiveCalled = false;
-            try{
+            try
+            {
                 AccessToken accessToken2 = await endpoint.SignInInteractive((_) => { interactiveCalled = true; }, new TimeSpan(0, 0, 4), null);
             }
             catch (SignInFailedException e)
@@ -254,6 +257,16 @@ namespace Acrolinx.Net.Tests
             var result = await endpoint.GetContentAnalysisDashboard(accessToken, batchId);
             Assert.IsNotNull(result);
             Assert.IsTrue(result.StartsWith(TestEnvironment.AcrolinxUrl));
+        }
+
+        [TestMethod]
+        public async Task TestGetCapabilities()
+        {
+            CreateEndpoint();
+            var accessToken = await GetAccessToken();
+            var result = await endpoint.GetCapabilities(accessToken);
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Data);
         }
 
         private async Task<CheckResponse> SubmitCheck(AccessToken accessToken, CheckRequest checkRequest)

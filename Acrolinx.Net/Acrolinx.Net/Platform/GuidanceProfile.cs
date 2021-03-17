@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-namespace Acrolinx.Net.Check
+namespace Acrolinx.Net.Platform
 {
-    public enum ReportType
+    public class GuidanceProfile
     {
-        TermHarvesting,
-        ScoreCard,
-        ContentAnalysisDashboard,
-        ExtractedText
+        public string Id { get; set; }
+        public string DisplayName { get; set; }
+        public Language Language { get; set; }
     }
 }

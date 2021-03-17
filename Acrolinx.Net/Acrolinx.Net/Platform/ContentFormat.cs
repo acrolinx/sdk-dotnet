@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-namespace Acrolinx.Net.Check
+using System;
+namespace Acrolinx.Net.Platform
 {
-    public enum ReportType
+    public class ContentFormat
     {
-        TermHarvesting,
-        ScoreCard,
-        ContentAnalysisDashboard,
-        ExtractedText
+        public string Id { get; set; }
+        public string DisplayName { get; set; }
     }
 }

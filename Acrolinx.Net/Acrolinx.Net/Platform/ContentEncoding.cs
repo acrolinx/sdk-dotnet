@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-namespace Acrolinx.Net.Check
+namespace Acrolinx.Net.Platform
 {
-    public enum ReportType
+    public enum ContentEncoding
     {
-        TermHarvesting,
-        ScoreCard,
-        ContentAnalysisDashboard,
-        ExtractedText
+        none,
+        base64
     }
 }

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-namespace Acrolinx.Net.Check
+namespace Acrolinx.Net.Platform
 {
-    public enum ReportType
+    public class Capabilities
     {
-        TermHarvesting,
-        ScoreCard,
-        ContentAnalysisDashboard,
-        ExtractedText
+        public CheckingCapabilities Checking { get; set; }
+        public Document Document { get; set; }
     }
 }

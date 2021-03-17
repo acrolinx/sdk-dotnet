@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-using System.Collections.Generic;
+using Acrolinx.Net.Check;
 using Acrolinx.Net.Utils;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using System.Collections.Generic;
 
-namespace Acrolinx.Net.Check
+namespace Acrolinx.Net.Platform
 {
-    public class CheckOptions
+    public class CheckingCapabilities
     {
-        public string GuidanceProfileId { get; set; }
-        public string BatchId { get; set; }
+        public List<GuidanceProfile> GuidanceProfiles { get; set; }
+        public List<ContentFormat> ContentFormats { get; set; }
+        public List<ContentEncoding> ContentEncodings { get; set; }
+        public string ReferencePattern { get; set; }
+        public List<CheckType> CheckTypes { get; set; }
         [JsonProperty(ItemConverterType = typeof(TolerantEnumConverter))]
         public List<ReportType?> ReportTypes { get; set; }
-        [JsonConverter(typeof(StringEnumConverter), converterParameters: typeof(CamelCaseNamingStrategy))]
-        public CheckType CheckType { get; set; }
-        public string ContentFormat { get; set; }
     }
 }

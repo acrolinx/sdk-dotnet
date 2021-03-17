@@ -29,6 +29,7 @@ using Acrolinx.Net.Check;
 using Acrolinx.Net.Internal;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Acrolinx.Net.Platform;
 
 namespace Acrolinx.Net
 {
@@ -182,12 +183,13 @@ namespace Acrolinx.Net
                     var pollUrl = obj.Links["poll"];
                     var start = DateTime.Now;
 
-                    TimeSpan minimalTimeout = obj.Data?.InteractiveLinkTimeout <= 0 ? timeout : 
+                    TimeSpan minimalTimeout = obj.Data?.InteractiveLinkTimeout <= 0 ? timeout :
                         new TimeSpan(Math.Min(new TimeSpan(0, 0, obj.Data.InteractiveLinkTimeout).Ticks, timeout.Ticks));
                     while (DateTime.Now - start < minimalTimeout)
                     {
                         var poll = await FetchDataFromApiPath<SignInResponse>(pollUrl, HttpMethod.Get, null, null, null);
-                        if (!string.IsNullOrEmpty(poll.Data?.AccessToken)){
+                        if (!string.IsNullOrEmpty(poll.Data?.AccessToken))
+                        {
                             return new AccessToken(poll.Data.AccessToken);
                         }
                         Thread.Sleep(poll.Progress.RetryAfter * 1000);
@@ -204,6 +206,11 @@ namespace Acrolinx.Net
             {
                 throw new SignInFailedException(e.Message, e);
             }
+        }
+
+        public async Task<CapabilityResponse> GetCapabilities(AccessToken accessToken)
+        {
+            return await FetchDataFromApiPath<CapabilityResponse>("capabilities", HttpMethod.Get, accessToken, null, null);
         }
 
         public async Task<CheckResponse> SubmitCheck(AccessToken accessToken, CheckRequest request)
