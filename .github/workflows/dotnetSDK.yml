@@ -20,6 +20,8 @@ jobs:
     env:
       Solution_Name: Acrolinx.Net/Acrolinx.Net.sln                                        # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: Acrolinx.Net/Acrolinx.Net.Tests/Acrolinx.Net.Tests.csproj        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      BUILD_NUMBER: ${{ github.run_number }}
+      VERSION: "1.0"
 
     steps:
     - name: Checkout
@@ -41,8 +43,15 @@ jobs:
       uses: nuget/setup-nuget@v1
     - run: nuget restore $env:Solution_Name
 
+    - name: Set version from tag name
+      if: startsWith(github.ref,'refs/tags/v')
+      shell: powershell
+      run: |
+        version=git describe --tags
+        $env.VERSION = version.substring(1)
+
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$env.VERSION
       env:
         Configuration: ${{ matrix.configuration }}
