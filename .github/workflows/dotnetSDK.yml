@@ -37,9 +37,9 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
 
-    # Execute all unit tests in the solution
-    - name: Execute unit tests
-      run: dotnet test
+    - name: Nuget restore
+      uses: nuget/setup-nuget@v1
+      run: nuget restore $env:Solution_Name
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
