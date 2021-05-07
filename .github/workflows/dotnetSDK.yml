@@ -39,7 +39,7 @@ jobs:
 
     - name: Nuget restore
       uses: nuget/setup-nuget@v1
-      run: nuget restore $env:Solution_Name
+    - run: nuget restore $env:Solution_Name
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
