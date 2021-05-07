@@ -60,7 +60,10 @@ jobs:
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$env:VERSION
       env:
         Configuration: ${{ matrix.configuration }}
-    
+
+    - name: tree
+      run: tree
+
     - name: Code signing
       env:
         CERTIFICATE: ${{ secrets.CERTIFICATE }}
@@ -72,10 +75,6 @@ jobs:
           $ErrorActionPreference = 'stop'
           $env:CERTIFICATE | Out-File -FilePath ./Certificate
           certutil -decode Certificate AcrolinxCertificate.pfx
-          dir $env:BINARY
-          dir Acrolinx.Net
           & $env:SIGNTOOL sign /f AcrolinxCertificate.pfx /p $env:CERTIFICATE_PASSWORD /tr http://timestamp.digicert.com /td sha256 /fd sha256 $env:BINARY
-          dir
-          dir Acrolinx.Net
           del .\Certificate
           del AcrolinxCertificate.pfx
