@@ -50,10 +50,10 @@ jobs:
       shell: powershell
       run: |
         version=git describe --tags
-        $env.VERSION = version.substring(1)
+        $env:VERSION = version.substring(1)
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$env.VERSION
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$env:VERSION
       env:
         Configuration: ${{ matrix.configuration }}
