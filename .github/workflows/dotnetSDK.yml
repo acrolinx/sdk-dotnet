@@ -55,7 +55,7 @@ jobs:
         Configuration: ${{ matrix.configuration }}
 
     - name: Build the application when tag is not created
-      if: ! startsWith(github.ref,'refs/tags/v')
+      if: false == startsWith(github.ref,'refs/tags/v')
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$env:VERSION
       env:
         Configuration: ${{ matrix.configuration }}
