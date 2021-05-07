@@ -50,11 +50,12 @@ jobs:
       shell: powershell
       run: |
         $version = git describe --tags
+        $version = $version.substring(1)
         msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$version
       env:
         Configuration: ${{ matrix.configuration }}
 
-    - name: Build the application when tag is not created
+    - name: Build when tag is not created
       if: false == startsWith(github.ref,'refs/tags/v')
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$env:VERSION
       env:
