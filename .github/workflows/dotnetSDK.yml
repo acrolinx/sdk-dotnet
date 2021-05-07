@@ -3,9 +3,6 @@ name: .NET SDK
 on:
   push:
     branches: [ BuildMigration ]
-    tags:
-      - "v*" # CSproject need version format with MajorVersoin.MinorVersion.Patch hence
-             # creat tags always with pattern like vx.x.x e.g. v1.2.3
 
   schedule:
     - cron: "30 5 * * *"
@@ -52,19 +49,12 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
 
-    - name: Build when tag created
-      if: startsWith(github.ref,'refs/tags/v')
+    - name: Build SDK
       shell: powershell
       run: |
-        $version = git describe --tags
-        $version = $version.substring(1)
+        $version = git describe --abbrev=0 --tags
+        $version = $version.substring(1) + "." + $env:BUILD_NUMBER
         msbuild $env:Solution_Name /t:rebuild /p:Configuration=$env:Configuration /p:Version=$version
-      env:
-        Configuration: ${{ matrix.configuration }}
-
-    - name: Build when tag is not created
-      if: false == startsWith(github.ref,'refs/tags/v')
-      run: msbuild $env:Solution_Name /t:rebuild /p:Configuration=$env:Configuration /p:Version=$env:VERSION
       env:
         Configuration: ${{ matrix.configuration }}
 
