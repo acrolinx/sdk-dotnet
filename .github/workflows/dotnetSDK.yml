@@ -45,15 +45,17 @@ jobs:
       uses: nuget/setup-nuget@v1
     - run: nuget restore $env:Solution_Name
 
-    - name: Set version from tag name
+    - name: Build when tag created
       if: startsWith(github.ref,'refs/tags/v')
       shell: powershell
       run: |
         $version = git describe --tags
-        $env:VERSION = $version.substring(1)
+        msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$version
+      env:
+        Configuration: ${{ matrix.configuration }}
 
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the application
+    - name: Build the application when tag is not created
+      if: ! startsWith(github.ref,'refs/tags/v')
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Version=$env:VERSION
       env:
         Configuration: ${{ matrix.configuration }}
