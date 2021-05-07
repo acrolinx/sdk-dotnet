@@ -18,8 +18,8 @@ jobs:
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
-      Solution_Name: Acrolinx.Net/Acrolinx.Net.sln              # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: Acrolinx.Net/Acrolinx.Net.Tests        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      Solution_Name: Acrolinx.Net/Acrolinx.Net.sln                                        # Replace with your solution name, i.e. MyWpfApp.sln.
+      Test_Project_Path: Acrolinx.Net/Acrolinx.Net.Tests/Acrolinx.Net.Tests.csproj        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
 
     steps:
     - name: Checkout
