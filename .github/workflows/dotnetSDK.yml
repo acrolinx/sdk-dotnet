@@ -65,13 +65,17 @@ jobs:
       env:
         CERTIFICATE: ${{ secrets.CERTIFICATE }}
         CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
-        BINARY: "./Acrolinx.Net/Acrolinx.Net/bin/Release/Acrolinx.Net.dll"
+        BINARY: "Acrolinx.Net/Acrolinx.Net/bin/Release/Acrolinx.Net.dll"
         SIGNTOOL: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe"
       shell: powershell
       run : |
           $ErrorActionPreference = 'stop'
-          $env:CERTIFICATE | Out-File -FilePath .\Certificate
+          $env:CERTIFICATE | Out-File -FilePath ./Certificate
           certutil -decode Certificate AcrolinxCertificate.pfx
+          dir $env:BINARY
+          dir Acrolinx.Net
           & $env:SIGNTOOL sign /f AcrolinxCertificate.pfx /p $env:CERTIFICATE_PASSWORD /tr http://timestamp.digicert.com /td sha256 /fd sha256 $env:BINARY
+          dir
+          dir Acrolinx.Net
           del .\Certificate
           del AcrolinxCertificate.pfx
