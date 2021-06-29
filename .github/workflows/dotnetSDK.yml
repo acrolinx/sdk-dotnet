@@ -95,5 +95,5 @@ jobs:
       with:
         name: dotNetSDK_Artifacts
         path: |
-          Acrolinx.Net/*.nupkg
+          *.nupkg
           Acrolinx.Net/Acrolinx.Net/bin/Release/
