@@ -75,3 +75,22 @@ jobs:
           & $env:SIGNTOOL sign /f AcrolinxCertificate.pfx /p $env:CERTIFICATE_PASSWORD /tr http://timestamp.digicert.com /td sha256 /fd sha256 $env:BINARY
           del .\Certificate
           del AcrolinxCertificate.pfx
+
+    - name: Create NuGet Package
+      env:
+        PROJECT_FILE_PATH: Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj
+      shell: powershell
+      run:  |
+          $version = git describe --abbrev=0 --tags
+          $version = $version.substring(1) + "." + $env:BUILD_NUMBER
+          & $msbuild /t:pack /p:IncludeSymbols=true /p:Configuration=$env:Configuration /p:Version=$version /p:PackageOutputPath=$pwd $env:PROJECT_FILE_PATH
+          $NugetPackage = Get-ChildItem *.nupkg -Exclude *.symbols.nupkg -name
+          Write-Host $NugetPackage
+
+    - name: Archive Github Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: dotNetSDK_Artifacts
+        path: |
+          Acrolinx.Net/*.nupkg
+          Acrolinx.Net/Acrolinx.Net/bin/Release/
