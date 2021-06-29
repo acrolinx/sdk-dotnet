@@ -85,7 +85,10 @@ jobs:
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
           msbuild /t:pack /p:IncludeSymbols=true /p:Configuration=$env:Configuration /p:Version=$version /p:PackageOutputPath=$pwd $env:PROJECT_FILE_PATH
           $NugetPackage = Get-ChildItem *.nupkg -Exclude *.symbols.nupkg -name
-          Write-Host $NugetPackage
+          Write-Host "NuGet package name is : " $NugetPackage
+
+    - name: Listing files in build folder
+      run: dir -r | Out-String -Stream | Select-String ":"
 
     - name: Archive Github Artifacts
       uses: actions/upload-artifact@v2
