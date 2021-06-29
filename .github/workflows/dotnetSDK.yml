@@ -83,7 +83,7 @@ jobs:
       run:  |
           $version = git describe --abbrev=0 --tags
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
-          & $msbuild /t:pack /p:IncludeSymbols=true /p:Configuration=$env:Configuration /p:Version=$version /p:PackageOutputPath=$pwd $env:PROJECT_FILE_PATH
+          msbuild /t:pack /p:IncludeSymbols=true /p:Configuration=$env:Configuration /p:Version=$version /p:PackageOutputPath=$pwd $env:PROJECT_FILE_PATH
           $NugetPackage = Get-ChildItem *.nupkg -Exclude *.symbols.nupkg -name
           Write-Host $NugetPackage
 
