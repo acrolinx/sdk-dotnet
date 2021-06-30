@@ -87,8 +87,19 @@ jobs:
           $NugetPackage = Get-ChildItem *.nupkg -Exclude *.symbols.nupkg -name
           Write-Host "NuGet package name is : " $NugetPackage
 
+    - name: Add nuget source to github (replacement for nexus)
+      run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/acrolinx/index.json" -UserName ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push nuget package to github
+      shell: powershell
+      run: |
+        $NugetPackage  = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
+        nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }} 
+
     - name: Listing files in build folder
-      run: dir -r | Out-String -Stream | Select-String ":"
+      run: |
+          tree
+          dir -r | Out-String -Stream | Select-String ":"
 
     - name: Archive Github Artifacts
       uses: actions/upload-artifact@v2
