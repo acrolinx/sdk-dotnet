@@ -24,6 +24,6 @@ namespace Acrolinx.Net.Check
         public string Id { get; set; }
         public Quality Quality { get; set; }
         public Dictionary<String, Report> Reports { get; set; }
-        //private List<Issue> issues;
+        public List<Issue> Issues { get; set; }
     }
 }

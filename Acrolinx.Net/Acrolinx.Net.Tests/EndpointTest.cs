@@ -269,6 +269,36 @@ namespace Acrolinx.Net.Tests
             Assert.IsNotNull(result.Data);
         }
 
+        [TestMethod]
+        public async Task TestCheckResultIssues()
+        {
+            CreateEndpoint();
+            var accessToken = await GetAccessToken();
+
+            var checkResponse = await SubmitCheck(accessToken, new CheckRequest()
+            {
+                CheckOptions = new CheckOptions()
+                {
+                    CheckType = CheckType.Automated,
+                    ContentFormat = "TEXT"
+                },
+                Content = "Thiss texxt containss intentional errorss!"
+            });
+
+            Assert.IsNotNull(checkResponse);
+            Assert.IsTrue(condition: (checkResponse.Links.ContainsKey("result")));
+
+            var checkResult = await endpoint.GetCheckResult(accessToken, checkResponse);
+            Assert.IsNotNull(checkResult.Issues);
+            Assert.IsTrue(checkResult.Issues.Count > 0);
+            Assert.IsNotNull(checkResult.Issues[0].PositionalInformation);
+            Assert.IsNotNull(checkResult.Issues[0].DisplaySurface);
+            Assert.IsNotNull(checkResult.Issues[0].GuidanceHtml);
+            Assert.IsNotNull(checkResult.Issues[0].GoalId);
+            Assert.IsNotNull(checkResult.Issues[0].Suggestions);
+
+        }
+
         private async Task<CheckResponse> SubmitCheck(AccessToken accessToken, CheckRequest checkRequest)
         {
             return await endpoint.SubmitCheck(accessToken, checkRequest);
