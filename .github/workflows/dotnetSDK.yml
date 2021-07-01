@@ -22,7 +22,7 @@ jobs:
       Solution_Name: Acrolinx.Net/Acrolinx.Net.sln                                        # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: Acrolinx.Net/Acrolinx.Net.Tests/Acrolinx.Net.Tests.csproj        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       BUILD_NUMBER: ${{ github.run_number }}
-      VERSION: "1.0.0"
+      VERSION: "1.0.1"
 
     steps:
     - name: Checkout
