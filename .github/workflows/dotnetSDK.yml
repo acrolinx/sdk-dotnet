@@ -76,6 +76,9 @@ jobs:
           del .\Certificate
           del AcrolinxCertificate.pfx
 
+    - name: Patch version in nuget spec
+      run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace '\$version\$',"`$version`$-$env:BUILD_NUMBER") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
+
     - name: Create NuGet Package
       env:
         PROJECT_FILE_PATH: Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj
@@ -84,8 +87,6 @@ jobs:
           $version = git describe --abbrev=0 --tags
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
           msbuild /t:pack /p:IncludeSymbols=true /p:Configuration=$env:Configuration /p:Version=$version /p:PackageOutputPath=$pwd $env:PROJECT_FILE_PATH
-          $NugetPackage = Get-ChildItem *.nupkg -Exclude *.symbols.nupkg -name
-          Write-Host "NuGet package name is : " $NugetPackage
 
     - name: Add nuget source to github (replacement for nexus)
       run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/acrolinx/index.json" -UserName ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }}
@@ -94,7 +95,11 @@ jobs:
       shell: powershell
       run: |
         $NugetPackage  = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
+        Write-Host "NuGet package name is : " $NugetPackage
         nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }} 
+
+    - name: Restore nuget spec
+      run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace ('\$version\$-'+$env:BUILD_NUMBER), "`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
 
     - name: Listing files in build folder
       run: |

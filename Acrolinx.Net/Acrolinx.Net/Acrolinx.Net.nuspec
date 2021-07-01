@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <owners>Acrolinx</owners>
+    <projectUrl>https://github.com/acrolinx/sdk-dotnet</projectUrl>
+    <repository type="git" url="https://github.com/acrolinx/sdk-dotnet" />
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Acrolinx .NET SDK</description>
+    <releaseNotes>Promoting to NuGet</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Acrolinx .Net SDK</tags>
+    <dependencies>
+      <dependency id ="Newtonsoft.Json" version="10.0.3"/>
+      <dependency id ="log4net" version="2.0.12"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="Acrolinx.Sidebar.log4net.xml" target="lib\net45" />
+  </files>
+</package>
