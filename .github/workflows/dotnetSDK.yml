@@ -49,8 +49,6 @@ jobs:
     - name: Test
       run: |
         '& "$(vswhere -property installationPath)\Common7\IDE\MSTest.exe" /testcontainer:"Acrolinx.Net\Acrolinx.Net.Tests\bin\Release\Acrolinx.Net.Tests.dll" /resultsfile:"Acrolinx.Net\Acrolinx.Net\bin\Release\testResult.xml"'
-        CheckLastExitCode
-        CheckTestResult
 
     - name: Code signing
       env:
