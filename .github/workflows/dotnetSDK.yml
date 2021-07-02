@@ -86,7 +86,7 @@ jobs:
       run:  |
           $version = git describe --abbrev=0 --tags
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
-          msbuild /t:pack /p:IncludeSymbols=true /p:Configuration=$env:Configuration /p:Version=$version /p:PackageOutputPath=$pwd $env:PROJECT_FILE_PATH
+          nuget pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" -properties Configuration=Release -symbols
 
     - name: Add nuget source to github (replacement for nexus)
       run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/acrolinx/index.json" -UserName ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }}
