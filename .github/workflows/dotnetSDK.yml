@@ -96,7 +96,7 @@ jobs:
       run: |
         $NugetPackage  = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
         Write-Host "NuGet package name is : " $NugetPackage
-        dotnet nuget push $NugetPackage  --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+        nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }} 
 
     - name: Restore nuget spec
       run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace ('\$version\$-'+$env:BUILD_NUMBER), "`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
