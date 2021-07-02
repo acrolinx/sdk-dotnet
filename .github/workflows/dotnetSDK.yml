@@ -34,34 +34,6 @@ jobs:
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
-    
-    # Define Functions
-    - name: Check Test Result Function
-      run: |
-        function CheckTestResult {
-          [xml]$XmlDocument = Get-Content -Path "Acrolinx.Net\bin\Release\testResult.xml"
-          $passedTestCount = $XmlDocument.TestRun.ResultSummary.Counters.passed
-          $executedTestCount = $XmlDocument.TestRun.ResultSummary.Counters.executed
-          Write-Host "$passedTestCount"
-          Write-Host "$executedTestCount"
-          if ( $passedTestCount -ne $executedTestCount ) {
-            exit 1
-            }
-        }
-    - name: Check Last Exit Code Function
-      run: |
-        function CheckLastExitCode { 
-          param ([int] $TheExitCode = 0, [int[]]$SuccessCodes = @(0), [scriptblock]$CleanupScript=$null) 
-
-          if ($SuccessCodes -notcontains $LastExitCode) { 
-            $OFS = $NL = [System.Environment]::NewLine 
-            # throw "EXE RETURNED EXIT CODE ${LastExitCode}${NL}" 
-            if ($TheExitCode -eq 0) { $TheExitCode = $LastExitCode }
-            $host.SetShouldExit($TheExitCode) 
-            Write-Host "Exit with error code $TheExitCode"
-            exit $TheExitCode
-          } 
-        } 
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
