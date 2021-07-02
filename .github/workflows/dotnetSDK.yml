@@ -10,11 +10,6 @@ on:
 jobs:
 
   build:
-
-    strategy:
-      matrix:
-        configuration: [Release]
-
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
@@ -22,7 +17,7 @@ jobs:
       Solution_Name: Acrolinx.Net/Acrolinx.Net.sln                                        # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: Acrolinx.Net/Acrolinx.Net.Tests/Acrolinx.Net.Tests.csproj        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       BUILD_NUMBER: ${{ github.run_number }}
-      VERSION: "1.0.1"
+      Configuration: Release
 
     steps:
     - name: Checkout
@@ -39,27 +34,51 @@ jobs:
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
+    
+    # Define Functions
+    - name: Check Test Result Function
+      run: |
+        function CheckTestResult {
+          [xml]$XmlDocument = Get-Content -Path "Acrolinx.Net\bin\Release\testResult.xml"
+          $passedTestCount = $XmlDocument.TestRun.ResultSummary.Counters.passed
+          $executedTestCount = $XmlDocument.TestRun.ResultSummary.Counters.executed
+          Write-Host "$passedTestCount"
+          Write-Host "$executedTestCount"
+          if ( $passedTestCount -ne $executedTestCount ) {
+            exit 1
+            }
+        }
+    - name: Check Last Exit Code Function
+      run: |
+        function CheckLastExitCode { 
+          param ([int] $TheExitCode = 0, [int[]]$SuccessCodes = @(0), [scriptblock]$CleanupScript=$null) 
 
-    - name: Nuget restore
-      uses: nuget/setup-nuget@v1
-    - run: nuget restore $env:Solution_Name
+          if ($SuccessCodes -notcontains $LastExitCode) { 
+            $OFS = $NL = [System.Environment]::NewLine 
+            # throw "EXE RETURNED EXIT CODE ${LastExitCode}${NL}" 
+            if ($TheExitCode -eq 0) { $TheExitCode = $LastExitCode }
+            $host.SetShouldExit($TheExitCode) 
+            Write-Host "Exit with error code $TheExitCode"
+            exit $TheExitCode
+          } 
+        } 
 
-    - name: Restore nuget
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
-
-    - name: Build SDK
+    # Restore the application to populate the obj folder with RuntimeIdentifiers
+    - name: Restore the application
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Platform="Any CPU"
+     
+    - name: Build
       shell: powershell
       run: |
         $version = git describe --abbrev=0 --tags
         $version = $version.substring(1) + "." + $env:BUILD_NUMBER
-        msbuild $env:Solution_Name /t:rebuild /p:Configuration=$env:Configuration /p:Version=$version
-      env:
-        Configuration: ${{ matrix.configuration }}
+        msbuild $env:Solution_Name /t:rebuild /p:Configuration=$env:Configuration /p:Version=$version /p:Platform="Any CPU"
 
-    - name: tree
-      run: tree
+    - name: Test
+      run: |
+        '& "$(vswhere -property installationPath)\Common7\IDE\MSTest.exe" /testcontainer:"Acrolinx.Net\Acrolinx.Net.Tests\bin\Release\Acrolinx.Net.Tests.dll" /resultsfile:"Acrolinx.Net\Acrolinx.Net\bin\Release\testResult.xml"'
+        CheckLastExitCode
+        CheckTestResult
 
     - name: Code signing
       env:
@@ -77,7 +96,7 @@ jobs:
           del AcrolinxCertificate.pfx
 
     - name: Patch version in nuget spec
-      run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace '\$version\$',"`$version`$-$env:BUILD_NUMBER") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
+      run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace '\$version\$',"`$version`") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
 
     - name: Create NuGet Package
       env:
@@ -94,7 +113,7 @@ jobs:
     - name: Push nuget package to github
       shell: powershell
       run: |
-        $NugetPackage  = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
+        $NugetPackage = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
         Write-Host "NuGet package name is : " $NugetPackage
         nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }} 
 
