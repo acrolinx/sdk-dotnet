@@ -94,7 +94,7 @@ jobs:
           Write-Host "NuGet package name is : " $NugetPackage
           nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Release
+      - name: Push nuget package to Nuget.org
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
