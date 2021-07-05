@@ -46,6 +46,7 @@ jobs:
       - name: Restore the application
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Platform="Any CPU"
 
+      # Build SDK
       - name: Build
         shell: powershell
         run: |
@@ -53,10 +54,12 @@ jobs:
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
           msbuild $env:Solution_Name /t:rebuild /p:Configuration=$env:Configuration /p:Version=$version /p:Platform="Any CPU"
 
+      # Run Test Project
       - name: Test
         run: |
           '& "$(vswhere -property installationPath)\Common7\IDE\MSTest.exe" /testcontainer:"Acrolinx.Net\Acrolinx.Net.Tests\bin\Release\Acrolinx.Net.Tests.dll" /resultsfile:"Acrolinx.Net\Acrolinx.Net\bin\Release\testResult.xml"'
 
+      # Sign the dll
       - name: Code signing
         env:
           CERTIFICATE: ${{ secrets.CERTIFICATE }}
@@ -72,9 +75,11 @@ jobs:
           del .\Certificate
           del AcrolinxCertificate.pfx
 
+      # Update .nuspec (Nuget Specification) with version number
       - name: Patch version in nuget spec
         run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace '\$version\$',"`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
 
+      # Create nuget package
       - name: Create NuGet Package
         env:
           PROJECT_FILE_PATH: Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj
@@ -84,9 +89,11 @@ jobs:
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
           nuget pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" -properties Configuration=Release -symbols
 
+      # Change source of nuget package to Github, to publish on Github registry
       - name: Add nuget source to github (replacement for nexus)
         run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/acrolinx/index.json" -UserName ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }}
 
+      # Push package to Github registry. Every build is pushed.
       - name: Push nuget package to github
         shell: powershell
         run: |
@@ -94,15 +101,16 @@ jobs:
           Write-Host "NuGet package name is : " $NugetPackage
           nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }}
 
+      # Push package to Nuget.org Only tags(v*) are pushed
       - name: Push nuget package to Nuget.org
         if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: nuget push $NugetPackage ${{ secrets.NUGET_API_KEY }} -Source nuget.org -Timeout 600
 
+      # Restore nuspec
       - name: Restore nuget spec
         run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace ('\$version\$-'+$env:BUILD_NUMBER), "`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
 
+      # Archive build artifacts
       - name: Archive Github Artifacts
         uses: actions/upload-artifact@v2
         with:
