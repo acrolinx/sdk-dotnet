@@ -12,9 +12,9 @@ on:
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Trigger Comment (Optional)'
+        description: "Trigger Comment (Optional)"
         required: false
-        default: 'Manual Workflow Run'
+        default: "Manual Workflow Run"
 
 jobs:
   build:
@@ -102,11 +102,6 @@ jobs:
 
       - name: Restore nuget spec
         run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace ('\$version\$-'+$env:BUILD_NUMBER), "`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
-
-      - name: Listing files in build folder
-        run: |
-          tree
-          dir -r | Out-String -Stream | Select-String ":"
 
       - name: Archive Github Artifacts
         uses: actions/upload-artifact@v2
