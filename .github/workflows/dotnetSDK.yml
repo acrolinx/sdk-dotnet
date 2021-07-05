@@ -88,7 +88,7 @@ jobs:
         nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }} 
 
     - name: Restore nuget spec
-      run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace ('\$version\$-'+$env:BUILD_NUMBER), "`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
+      run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace '\$version\$', $version) | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
 
     - name: Listing files in build folder
       run: |
