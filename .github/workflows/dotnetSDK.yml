@@ -1,1 +1,131 @@
+name: .NET SDK
 
+on:
+  push:
+    branches: [master]
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Trigger Comment (Optional)"
+        required: false
+        default: "Manual Workflow Run"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      Solution_Name: Acrolinx.Net/Acrolinx.Net.sln
+      Test_Project_Path: Acrolinx.Net/Acrolinx.Net.Tests/Acrolinx.Net.Tests.csproj
+      BUILD_NUMBER: ${{ github.run_number }}
+      Configuration: Release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Install the .NET Core workload
+      - name: Install .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      # Restore the application to populate the obj folder with RuntimeIdentifiers
+      - name: Restore the application
+        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /p:Platform="Any CPU"
+
+      # Build SDK
+      - name: Build
+        shell: powershell
+        run: |
+          $version = git describe --abbrev=0 --tags
+          $version = $version.substring(1) + "." + $env:BUILD_NUMBER
+          msbuild $env:Solution_Name /t:rebuild /p:Configuration=$env:Configuration /p:Version=$version /p:Platform="Any CPU"
+
+      # Run Test Project
+      - name: Test
+        run: |
+          '& "$(vswhere -property installationPath)\Common7\IDE\MSTest.exe" /testcontainer:"Acrolinx.Net\Acrolinx.Net.Tests\bin\Release\Acrolinx.Net.Tests.dll" /resultsfile:"Acrolinx.Net\Acrolinx.Net\bin\Release\testResult.xml"'
+
+      # Sign the dll
+      - name: Code signing
+        env:
+          CERTIFICATE: ${{ secrets.CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          BINARY: "Acrolinx.Net/Acrolinx.Net/bin/Release/Acrolinx.Net.dll"
+          SIGNTOOL: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe"
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'stop'
+          $env:CERTIFICATE | Out-File -FilePath ./Certificate
+          certutil -decode Certificate AcrolinxCertificate.pfx
+          & $env:SIGNTOOL sign /f AcrolinxCertificate.pfx /p $env:CERTIFICATE_PASSWORD /tr http://timestamp.digicert.com /td sha256 /fd sha256 $env:BINARY
+          del .\Certificate
+          del AcrolinxCertificate.pfx
+
+      # Update .nuspec (Nuget Specification) with version number
+      - name: Patch version in nuget spec
+        run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace '\$version\$',"`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
+
+      # Create nuget package
+      - name: Create NuGet Package
+        env:
+          PROJECT_FILE_PATH: Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj
+        shell: powershell
+        run: |
+          $version = git describe --abbrev=0 --tags
+          $version = $version.substring(1) + "." + $env:BUILD_NUMBER
+          nuget pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" -properties Configuration=Release -symbols
+
+      # Change source of nuget package to Github, to publish on Github registry
+      - name: Add nuget source to github (replacement for nexus)
+        run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/acrolinx/index.json" -UserName ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }}
+
+      # Push package to Github registry. Every build is pushed.
+      - name: Push nuget package to github
+        shell: powershell
+        run: |
+          $NugetPackage = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
+          Write-Host "NuGet package name is : " $NugetPackage
+          nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }}
+
+      # Push package to Nuget.org Only for tags(v*)
+      - name: Push nuget package to Nuget.org
+        if: startsWith(github.ref, 'refs/tags/')
+        run: nuget push $NugetPackage ${{ secrets.NUGET_API_KEY }} -Source nuget.org -Timeout 600
+
+      # Create a release on GitHub. Only for tags(v*)
+      - name: Release secure tunnel
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            *.nupkg
+            Acrolinx.Net/Acrolinx.Net/bin/Release/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Restore nuspec
+      - name: Restore nuget spec
+        run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace ('\$version\$-'+$env:BUILD_NUMBER), "`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
+
+      # Archive build artifacts
+      - name: Archive Github Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dotNetSDK_Artifacts
+          path: |
+            *.nupkg
+            Acrolinx.Net/Acrolinx.Net/bin/Release/
