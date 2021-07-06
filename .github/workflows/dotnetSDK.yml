@@ -104,7 +104,10 @@ jobs:
       # Push package to Nuget.org Only for tags(v*)
       - name: Push nuget package to Nuget.org
         if: startsWith(github.ref, 'refs/tags/')
-        run: nuget push $NugetPackage ${{ secrets.NUGET_API_KEY }} -Source nuget.org -Timeout 600
+        run: |
+          $NugetPackage = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
+          Write-Host "Pushing to Nuget.org. NuGet package name is : " $NugetPackage
+          nuget push $NugetPackage ${{ secrets.NUGET_API_KEY }} -Source nuget.org -Timeout 600
 
       # Create a release on GitHub. Only for tags(v*)
       - name: Release secure tunnel
