@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessToken.cs" />
+    <Compile Include="Check\Issue.cs" />
     <Compile Include="Platform\Capabilities.cs" />
     <Compile Include="Platform\CapabilityResponse.cs" />
     <Compile Include="Platform\CheckingCapabilities.cs" />
