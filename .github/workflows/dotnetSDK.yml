@@ -110,7 +110,7 @@ jobs:
           nuget push $NugetPackage ${{ secrets.NUGET_API_KEY }} -Source nuget.org -Timeout 600
 
       # Create a release on GitHub. Only for tags(v*)
-      - name: Release secure tunnel
+      - name: Create a release in Github
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
