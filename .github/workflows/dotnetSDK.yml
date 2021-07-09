@@ -2,7 +2,7 @@ name: .NET SDK
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     tags:
       - "v*.*.*"
   pull_request:
