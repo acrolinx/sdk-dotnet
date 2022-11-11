@@ -230,7 +230,8 @@ namespace Acrolinx.Net.Tests
                 CheckOptions = new CheckOptions()
                 {
                     CheckType = CheckType.Automated,
-                    ContentFormat = "TEXT"
+                    ContentFormat = "TEXT",
+                    GuidanceProfileId = "85d7c67b-9daf-3f95-9089-68eeadca6914"
                 },
                 Content = "Testdokument"
             });

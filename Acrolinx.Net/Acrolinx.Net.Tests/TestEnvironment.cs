@@ -23,9 +23,13 @@ namespace Acrolinx.Net.Tests
     {
         public static AcrolinxEndpoint CreateEndpoint()
         {
-            return new AcrolinxEndpoint(
-                            AcrolinxUrl,
-                            "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5");
+            var signature = Environment.GetEnvironmentVariable("ACROLINX_DEV_SIGNATURE");
+            if (signature == null)
+            {
+                Trace.WriteLine("ACROLINX_DEV_SIGNATURE is unset");
+            }
+
+            return new AcrolinxEndpoint(AcrolinxUrl, signature);
         }
 
         public static string SsoToken
@@ -34,7 +38,8 @@ namespace Acrolinx.Net.Tests
             {
                 var token = Environment.GetEnvironmentVariable("ACROLINX_API_SSO_TOKEN");
 
-                if (token == null) {
+                if (token == null)
+                {
                     Trace.WriteLine("ACROLINX_API_SSO_TOKEN is unset");
                 }
 
@@ -49,7 +54,7 @@ namespace Acrolinx.Net.Tests
                 var url = Environment.GetEnvironmentVariable("ACROLINX_API_URL");
                 if (string.IsNullOrWhiteSpace(url))
                 {
-                    return "https://test-ssl.acrolinx.com";
+                    return "https://partner-dev.internal.acrolinx.sh";
                 }
                 return url;
             }
