@@ -230,9 +230,10 @@ namespace Acrolinx.Net
             return await FetchDataFromApiPath<CheckPollResponse>(url, HttpMethod.Get, accessToken, null, null);
         }
 
-        public async Task<CheckResult> GetCheckResult(AccessToken accessToken, CheckResponse checkResponse)
+        public async Task<CheckResult> GetCheckResult(AccessToken accessToken, CheckResponse checkResponse, double timeOutIntervalInMilliseconds = 120000)
         {
-            while (true)
+            var end = DateTimeOffset.UtcNow.Add(TimeSpan.FromMilliseconds(timeOutIntervalInMilliseconds));
+            while (DateTimeOffset.UtcNow < end)
             {
                 var result = await PollResult(accessToken, checkResponse);
                 if (result.Data != null)
@@ -241,6 +242,28 @@ namespace Acrolinx.Net
                 }
                 Thread.Sleep(result.Progress.RetryAfter * 1000);
             }
+            throw new LowLevelApiException("Timeout");
+        }
+
+        public double CalculateTimeoutBasedOnContentSize(string context, double maxTimeoutInSeconds = 120)
+        {
+            var fileSizeInBytes = context.Length * sizeof(char);
+            var maxTimeoutInMs = maxTimeoutInSeconds * 1000;
+            var fileSizeInKB = fileSizeInBytes * 0.001;
+
+            if (fileSizeInKB < 100)
+            {
+                return maxTimeoutInMs / 8;
+            }
+            else if (fileSizeInKB < 500)
+            {
+                return maxTimeoutInMs / 4;
+            }
+            else if (fileSizeInKB < 1000)
+            {
+                return maxTimeoutInMs / 2;
+            }
+            return maxTimeoutInMs;
         }
 
         public async Task<string> GetContentAnalysisDashboard(AccessToken accessToken, string batchId)
@@ -252,7 +275,8 @@ namespace Acrolinx.Net
         public async Task<CheckResult> Check(AccessToken accessToken, CheckRequest checkRequest)
         {
             var checkResponse = await SubmitCheck(accessToken, checkRequest);
-            return await GetCheckResult(accessToken, checkResponse);
+            var timeOutInterval = CalculateTimeoutBasedOnContentSize(checkRequest.Content);
+            return await GetCheckResult(accessToken, checkResponse, timeOutInterval);
         }
     }
 }
