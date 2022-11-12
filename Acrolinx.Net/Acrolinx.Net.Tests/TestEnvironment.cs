@@ -26,7 +26,8 @@ namespace Acrolinx.Net.Tests
             var signature = Environment.GetEnvironmentVariable("ACROLINX_DEV_SIGNATURE");
             if (signature == null)
             {
-                Trace.WriteLine("ACROLINX_DEV_SIGNATURE is unset");
+                // If you don't have signature contant acrolinx
+                Trace.WriteLine("Set the acrolinx client signature");
             }
 
             return new AcrolinxEndpoint(AcrolinxUrl, signature);
@@ -40,7 +41,7 @@ namespace Acrolinx.Net.Tests
 
                 if (token == null)
                 {
-                    Trace.WriteLine("ACROLINX_API_SSO_TOKEN is unset");
+                    Trace.WriteLine("Set the SSO token");
                 }
 
                 return token;
@@ -53,8 +54,8 @@ namespace Acrolinx.Net.Tests
             {
                 var url = Environment.GetEnvironmentVariable("ACROLINX_API_URL");
                 if (string.IsNullOrWhiteSpace(url))
-                {
-                    return "https://partner-dev.internal.acrolinx.sh";
+                { 
+                    Trace.WriteLine("Set the acrolinx url");
                 }
                 return url;
             }
@@ -67,7 +68,7 @@ namespace Acrolinx.Net.Tests
                 var username = Environment.GetEnvironmentVariable("ACROLINX_API_USERNAME");
                 if (string.IsNullOrWhiteSpace(username))
                 {
-                    return "sdk.net.testuser";
+                    Trace.WriteLine("Set the acrolinx use name");
                 }
                 return username;
             }

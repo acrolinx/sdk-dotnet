@@ -231,6 +231,7 @@ namespace Acrolinx.Net.Tests
                 {
                     CheckType = CheckType.Automated,
                     ContentFormat = "TEXT",
+                    // Adjust following id as per your test instance. 
                     GuidanceProfileId = "85d7c67b-9daf-3f95-9089-68eeadca6914"
                 },
                 Content = "Testdokument"
