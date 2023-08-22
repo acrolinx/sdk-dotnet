@@ -7,7 +7,7 @@ updates:
     reviewers:
       - abhijeetnarvekar
   - package-ecosystem: "nuget"
-    directory: "/"
+    directory: "/Acrolinx.Net/Acrolinx.Net/"
     schedule:
       interval: "daily"
     reviewers:
