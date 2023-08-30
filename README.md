@@ -17,7 +17,7 @@ Acrolinx offers different other SDKs, and examples for developing integrations.
 
 Before you start developing your own integration, you might benefit from looking into:
 
-* [Getting Started with Custom Integrations](https://docs.acrolinx.com/customintegrations),
+* [Build With Acrolinx](https://support.acrolinx.com/hc/en-us/categories/10209837818770-Build-With-Acrolinx),
 * the [Guidance for the Development of Acrolinx Integrations](https://github.com/acrolinx/acrolinx-coding-guidance),
 * the [Acrolinx Platform API](https://github.com/acrolinx/platform-api)
 * the [Rendered Version of Acrolinx Platform API](https://acrolinxapi.docs.apiary.io/#)
