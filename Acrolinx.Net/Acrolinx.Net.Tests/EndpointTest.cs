@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
 using Acrolinx.Net.Acrolinx.Net;
 using Acrolinx.Net.Check;
 using Acrolinx.Net.Exceptions;
 using Acrolinx.Net.Utils;
 using Moq;
-using System.Threading;
-using System;
 
 namespace Acrolinx.Net.Tests
 {
