@@ -87,7 +87,7 @@ jobs:
         run: |
           $version = git describe --abbrev=0 --tags
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
-          dotnet pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" --configuration=Release
+          dotnet pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" --configuration=Release --include-symbols --output ./
 
       # Change source of nuget package to Github, to publish on Github registry
       - name: Add nuget source to github (replacement for nexus)
@@ -116,7 +116,7 @@ jobs:
         with:
           files: |
             *.nupkg
-            Acrolinx.Net/Acrolinx.Net/bin/Release/
+            Acrolinx.Net/Acrolinx.Net/bin/Release/netstandard2.0/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -131,4 +131,4 @@ jobs:
           name: dotNetSDK_Artifacts
           path: |
             *.nupkg
-            Acrolinx.Net/Acrolinx.Net/bin/Release/
+            Acrolinx.Net/Acrolinx.Net/bin/Release/netstandard2.0/
