@@ -87,7 +87,7 @@ jobs:
         run: |
           $version = git describe --abbrev=0 --tags
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
-          nuget pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" -properties Configuration=Release -symbols
+          dotnet pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" --configuration=Release
 
       # Change source of nuget package to Github, to publish on Github registry
       - name: Add nuget source to github (replacement for nexus)
