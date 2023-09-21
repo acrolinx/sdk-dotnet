@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +31,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Acrolinx.Net.Platform;
 
+[assembly: InternalsVisibleTo("Acrolinx.Net.Tests")]
 namespace Acrolinx.Net
 {
     public class AcrolinxEndpoint
