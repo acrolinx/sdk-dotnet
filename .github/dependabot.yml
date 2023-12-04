@@ -6,15 +6,18 @@ updates:
       interval: "daily"
     reviewers:
       - abhijeetnarvekar
+      - mscc-sascha
   - package-ecosystem: "nuget"
     directory: "/Acrolinx.Net/Acrolinx.Net/"
     schedule:
       interval: "daily"
     reviewers:
       - abhijeetnarvekar
+      - mscc-sascha
   - package-ecosystem: "nuget"
     directory: "/Acrolinx.Net/Acrolinx.Net.Tests/"
     schedule:
       interval: "daily"
     reviewers:
       - abhijeetnarvekar
+      - mscc-sascha
