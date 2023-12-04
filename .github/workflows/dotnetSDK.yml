@@ -67,6 +67,7 @@ jobs:
           BINARY: "Acrolinx.Net/Acrolinx.Net/bin/Release/netstandard2.0/Acrolinx.Net.dll"
           SIGNTOOL: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe"
         shell: powershell
+        if: ${{ (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')) }}
         run: |
           $ErrorActionPreference = 'stop'
           $env:CERTIFICATE | Out-File -FilePath ./Certificate
@@ -96,6 +97,7 @@ jobs:
       # Push package to Github registry. Every build is pushed.
       - name: Push nuget package to github
         shell: powershell
+        if: ${{ (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')) }}
         run: |
           $NugetPackage = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
           Write-Host "NuGet package name is : " $NugetPackage
