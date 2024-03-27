@@ -133,7 +133,7 @@ jobs:
 
       # Create a release on GitHub. Only for tags(v*)
       - name: Create a release in Github
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
