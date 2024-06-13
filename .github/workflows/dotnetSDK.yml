@@ -59,22 +59,42 @@ jobs:
         run: |        
           '& dotnet test Acrolinx.Net\Acrolinx.Net.Tests\bin\Release\net7.0\Acrolinx.Net.Tests.dll -l:trx;LogFileName=Acrolinx.Net\Acrolinx.Net\bin\Release\testResult.xml'
 
-      # Sign the dll
-      - name: Code signing
+      - name: Setup Certificate
+        if: ${{(startsWith(github.ref, 'refs/tags/')) }}
+        run: | 
+          echo "${{secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12 
+        shell: bash
+      
+      - name: Set variables 
+        id: variables
+        if: ${{(startsWith(github.ref, 'refs/tags/')) }}
+        run: | 
+          echo "::set-output name=version::${GITHUB_REF#refs/tags/v}" 
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV" 
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV" 
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV" 
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV" 
+          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH 
+          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH 
+          echo "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools" >> $GITHUB_PATH 
+        shell: bash
+      
+      - name: Setup SSM KSP on windows latest
+        if: ${{(startsWith(github.ref, 'refs/tags/')) }}
+        run: | 
+          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:%SM_API_KEY%" -o smtools-windows-x64.msi 
+          msiexec /i smtools-windows-x64.msi /quiet /qn
+          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user >nul 2>&1
+          smksp_cert_sync.exe >nul 2>&1
+        shell: cmd 
+      
+      - name: Signing using Signtool
+        if: ${{(startsWith(github.ref, 'refs/tags/')) }}
         env:
-          CERTIFICATE: ${{ secrets.CERTIFICATE }}
-          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
           BINARY: "Acrolinx.Net/Acrolinx.Net/bin/Release/netstandard2.0/Acrolinx.Net.dll"
-          SIGNTOOL: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe"
-        shell: powershell
-        if: ${{ (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')) }}
-        run: |
-          $ErrorActionPreference = 'stop'
-          $env:CERTIFICATE | Out-File -FilePath ./Certificate
-          certutil -decode Certificate AcrolinxCertificate.pfx
-          & $env:SIGNTOOL sign /f AcrolinxCertificate.pfx /p $env:CERTIFICATE_PASSWORD /tr http://timestamp.digicert.com /td sha256 /fd sha256 $env:BINARY
-          del .\Certificate
-          del AcrolinxCertificate.pfx
+        run: | 
+          signtool.exe sign /sha1 ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 $env:BINARY 
+          signtool.exe verify /v /pa $env:BINARY
 
       # Update .nuspec (Nuget Specification) with version number
       - name: Patch version in nuget spec
