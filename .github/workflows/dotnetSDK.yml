@@ -10,11 +10,6 @@ on:
   schedule:
     - cron: "30 5 * * *"
   workflow_dispatch:
-    inputs:
-      reason:
-        description: "Trigger Comment (Optional)"
-        required: false
-        default: "Manual Workflow Run"
 
 jobs:
   build:
@@ -32,75 +27,68 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Install the .NET Core workload
       - name: Install .NET 7.0.x
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 7.0.x
 
-      # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
 
-      # Restore the application to populate the obj folder with RuntimeIdentifiers
       - name: Restore the application
         run: dotnet restore $env:Solution_Name
 
-      # Build SDK
-      - name: Build
+      - name: Build SDK
         shell: powershell
         run: |
           $version = git describe --abbrev=0 --tags
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
           dotnet build $env:Solution_Name --configuration $env:Configuration -p:Version=$version -p:Platform="Any CPU"
 
-      # Run Test Project
-      - name: Test
-        run: |        
+      - name: run Test project
+        run: |
           '& dotnet test Acrolinx.Net\Acrolinx.Net.Tests\bin\Release\net7.0\Acrolinx.Net.Tests.dll -l:trx;LogFileName=Acrolinx.Net\Acrolinx.Net\bin\Release\testResult.xml'
 
       - name: Setup Certificate
         if: ${{(startsWith(github.ref, 'refs/tags/')) }}
-        run: | 
-          echo "${{secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12 
+        run: |
+          echo "${{secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
         shell: bash
-      
-      - name: Set variables 
+
+      - name: Set variables
         id: variables
         if: ${{(startsWith(github.ref, 'refs/tags/')) }}
-        run: | 
-          echo "::set-output name=version::${GITHUB_REF#refs/tags/v}" 
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV" 
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV" 
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV" 
-          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV" 
-          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH 
-          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH 
-          echo "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools" >> $GITHUB_PATH 
+        run: |
+          echo "::set-output name=version::${GITHUB_REF#refs/tags/v}"
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
+          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
+          echo "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools" >> $GITHUB_PATH
         shell: bash
-      
+
       - name: Setup SSM KSP on windows latest
         if: ${{(startsWith(github.ref, 'refs/tags/')) }}
-        run: | 
-          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:%SM_API_KEY%" -o smtools-windows-x64.msi 
+        run: |
+          curl -X GET  https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download -H "x-api-key:%SM_API_KEY%" -o smtools-windows-x64.msi
           msiexec /i smtools-windows-x64.msi /quiet /qn
           C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user >nul 2>&1
           smksp_cert_sync.exe >nul 2>&1
-        shell: cmd 
-      
+        shell: cmd
+
       - name: Signing using Signtool
         if: ${{(startsWith(github.ref, 'refs/tags/')) }}
         env:
           BINARY: "Acrolinx.Net/Acrolinx.Net/bin/Release/netstandard2.0/Acrolinx.Net.dll"
-        run: | 
-          signtool.exe sign /sha1 ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 $env:BINARY 
+        run: |
+          signtool.exe sign /sha1 ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 $env:BINARY
           signtool.exe verify /v /pa $env:BINARY
 
-      # Update .nuspec (Nuget Specification) with version number
-      - name: Patch version in nuget spec
+      - name: Patch version number in nuget spec
         run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace '\$version\$',"`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
 
-      # Create nuget package
       - name: Create NuGet Package
         env:
           PROJECT_FILE_PATH: Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj
@@ -110,12 +98,10 @@ jobs:
           $version = $version.substring(1) + "." + $env:BUILD_NUMBER
           dotnet pack ".\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.csproj" -p:Version=$version --configuration=Release --include-symbols --output ./
 
-      # Change source of nuget package to Github, to publish on Github registry
-      - name: Add nuget source to github (replacement for nexus)
+      - name: Add nuget source to publish on GitHub registry
         run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/acrolinx/index.json" -UserName ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }}
 
-      # Push package to Github registry. Every build is pushed.
-      - name: Push nuget package to github
+      - name: Push nuget package to GitHub
         shell: powershell
         if: ${{ (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')) }}
         run: |
@@ -123,16 +109,14 @@ jobs:
           Write-Host "NuGet package name is : " $NugetPackage
           nuget push $NugetPackage -source "GitHub" -ApiKey ${{ secrets.GITHUB_TOKEN }}
 
-      # Push package to Nuget.org Only for tags(v*)
-      - name: Push nuget package to Nuget.org
+      - name: Push nuget package to Nuget.org (only for tags)
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           $NugetPackage = Get-ChildItem .\*.nupkg -Exclude *.symbols.nupkg -name
           Write-Host "Pushing to Nuget.org. NuGet package name is : " $NugetPackage
           nuget push $NugetPackage ${{ secrets.NUGET_API_KEY }} -Source nuget.org -Timeout 600
 
-      # Create a release on GitHub. Only for tags(v*)
-      - name: Create a release in Github
+      - name: Create a release in GitHub (only for tags)
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -142,12 +126,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Restore nuspec
       - name: Restore nuget spec
         run: ((Get-Content -path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec -Raw) -replace ('\$version\$-'+$env:BUILD_NUMBER), "`$version`$") | Set-Content -Path .\Acrolinx.Net\Acrolinx.Net\Acrolinx.Net.nuspec
 
-      # Archive build artifacts
-      - name: Archive Github Artifacts
+      - name: Archive GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dotNetSDK_Artifacts
