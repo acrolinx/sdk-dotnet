@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     env:
       Solution_Name: Acrolinx.Net/Acrolinx.Net.sln
@@ -51,8 +51,7 @@ jobs:
 
       - name: Setup Certificate
         if: ${{(startsWith(github.ref, 'refs/tags/')) }}
-        run: |
-          echo "${{secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
+        run: echo "${{secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
         shell: bash
 
       - name: Set variables
