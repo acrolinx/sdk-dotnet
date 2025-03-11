@@ -18,58 +18,60 @@ using System.Diagnostics;
 
 namespace Acrolinx.Net.Tests
 {
-    class TestEnvironment
+    public class TestEnvironment
     {
-        public static AcrolinxEndpoint CreateEndpoint()
-        {
-            var signature = Environment.GetEnvironmentVariable("ACROLINX_DEV_SIGNATURE");
-            if (signature == null)
-            {
-                // If you don't have signature contant acrolinx
-                Trace.WriteLine("Set the acrolinx client signature");
-            }
+        private readonly string _signature;
+        private readonly string _acrolinxUrl;
+        private readonly string _username;
+        private readonly string _ssoToken;
 
-            return new AcrolinxEndpoint(AcrolinxUrl, signature);
+        public TestEnvironment(string signature, string acrolinxUrl, string username, string ssoToken)
+        {
+            _signature = signature;
+            _acrolinxUrl = acrolinxUrl;
+            _username = username;
+            _ssoToken = ssoToken;
         }
 
-        public static string SsoToken
+        public AcrolinxEndpoint CreateEndpoint()
+        {
+            return new AcrolinxEndpoint(AcrolinxUrl, _signature);
+        }
+
+        public string SsoToken
         {
             get
             {
-                var token = Environment.GetEnvironmentVariable("ACROLINX_API_SSO_TOKEN");
-
-                if (token == null)
+                if (_ssoToken == null)
                 {
                     Trace.WriteLine("Set the SSO token");
                 }
 
-                return token;
+                return _ssoToken;
             }
         }
 
-        public static string AcrolinxUrl
+        public string AcrolinxUrl
         {
             get
             {
-                var url = Environment.GetEnvironmentVariable("ACROLINX_API_URL");
-                if (string.IsNullOrWhiteSpace(url))
-                { 
+                if (string.IsNullOrWhiteSpace(_acrolinxUrl))
+                {
                     Trace.WriteLine("Set the acrolinx url");
                 }
-                return url;
+                return _acrolinxUrl;
             }
         }
 
-        public static string Username
+        public string Username
         {
             get
             {
-                var username = Environment.GetEnvironmentVariable("ACROLINX_API_USERNAME");
-                if (string.IsNullOrWhiteSpace(username))
+                if (string.IsNullOrWhiteSpace(_username))
                 {
                     Trace.WriteLine("Set the acrolinx use name");
                 }
-                return username;
+                return _username;
             }
         }
     }

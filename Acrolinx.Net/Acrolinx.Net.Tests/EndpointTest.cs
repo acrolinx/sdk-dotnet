@@ -23,21 +23,25 @@ using Moq;
 namespace Acrolinx.Net.Tests
 {
     [TestClass]
-    public class EndpointTest
+    public class EndpointTest : TestBase
     {
         private AcrolinxEndpoint endpoint = null;
+
+        [TestInitialize] // Runs before each test
+        public void Init()
+        {
+            endpoint = TestEnvironment.CreateEndpoint();
+        }
 
         [TestMethod]
         public void TestCreate()
         {
-            CreateEndpoint();
             Assert.IsNotNull(endpoint);
         }
 
         [TestMethod]
         public async Task TestSso()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
 
             Assert.IsNotNull(accessToken);
@@ -52,7 +56,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestSsoFailDueToWrongToken()
         {
-            CreateEndpoint();
             try
             {
                 await endpoint.SignInWithSSO("something", TestEnvironment.Username);
@@ -69,7 +72,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestSsoFailDueToMissingMetadata()
         {
-            CreateEndpoint();
             try
             {
                 await endpoint.SignInWithSSO(TestEnvironment.SsoToken, TestEnvironment.Username + "_without_metadata");
@@ -86,7 +88,6 @@ namespace Acrolinx.Net.Tests
         [Timeout(3000)]
         public void TestSignInInteractiveHasPollUrl()
         {
-            CreateEndpoint();
             var openUrlMock = new Mock<AcrolinxEndpoint.OpenUrl>();
             var signIn = endpoint.SignInInteractive(openUrlMock.Object);
             Thread.Sleep(2000);
@@ -98,7 +99,6 @@ namespace Acrolinx.Net.Tests
         [ExpectedException(typeof(SignInFailedException), "Timeout")]
         public async Task TestSignInInteractiveTimeout()
         {
-            CreateEndpoint();
             await endpoint.SignInInteractive((url) => { }, new TimeSpan(0, 0, 1), null);
         }
 
@@ -107,7 +107,6 @@ namespace Acrolinx.Net.Tests
         [Ignore]
         public async Task ManualTestSignInInteractive()
         {
-            CreateEndpoint();
             AccessToken accessToken = await endpoint.SignInInteractive((url) =>
             {
                 System.Diagnostics.Trace.WriteLine("Sign in manually in browser please: " + url);
@@ -121,7 +120,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestSubmitCheck()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
 
             var checkRequest = new CheckRequest()
@@ -143,7 +141,6 @@ namespace Acrolinx.Net.Tests
         [Timeout(4 * 1000)]
         public async Task TestSignInInteractiveWithTokenUsesTokenWithoutUserInteraction()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
 
             bool interactiveCalled = false;
@@ -157,7 +154,6 @@ namespace Acrolinx.Net.Tests
         [Timeout(10 * 1000)]
         public async Task TestSignInInteractiveWithInvalidTokenFallsBackToInteractive()
         {
-            CreateEndpoint();
             var accessToken = new AccessToken("invalid");
 
             bool interactiveCalled = false;
@@ -177,8 +173,6 @@ namespace Acrolinx.Net.Tests
         [Timeout(10 * 1000)]
         public async Task TestSignInInteractiveWithInvalidTokenFallsBackToInteractive2()
         {
-            CreateEndpoint();
-
             bool interactiveCalled = false;
             try
             {
@@ -195,7 +189,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestPoll()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
 
             var checkResponse = await SubmitCheck(accessToken, new CheckRequest()
@@ -218,7 +211,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestCheckResponse()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
 
             var checkResponse = await SubmitCheck(accessToken, new CheckRequest()
@@ -248,7 +240,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestContentAnalysis()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
 
             var batchId = BatchCheckIdGenerator.GenerateId("NetSDKTest");
@@ -260,7 +251,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestGetCapabilities()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
             var result = await endpoint.GetCapabilities(accessToken);
             Assert.IsNotNull(result);
@@ -270,7 +260,6 @@ namespace Acrolinx.Net.Tests
         [TestMethod]
         public async Task TestCheckResultIssues()
         {
-            CreateEndpoint();
             var accessToken = await GetAccessToken();
 
             var checkResponse = await SubmitCheck(accessToken, new CheckRequest()
@@ -301,12 +290,5 @@ namespace Acrolinx.Net.Tests
         {
             return await endpoint.SubmitCheck(accessToken, checkRequest);
         }
-
-        private void CreateEndpoint()
-        {
-            endpoint = TestEnvironment.CreateEndpoint();
-        }
-
-
     }
 }
