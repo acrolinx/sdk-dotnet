@@ -107,7 +107,8 @@ namespace Acrolinx.Net
             {
                 return apiPath;
             }
-            return acrolinxUrl + "/api/v1/" + apiPath;
+
+            return acrolinxUrl.TrimEnd('/') + "/api/v1/" + apiPath;
         }
 
         private static void AddExtraHeader(Dictionary<string, string> extraHeaders, HttpRequestMessage request)
