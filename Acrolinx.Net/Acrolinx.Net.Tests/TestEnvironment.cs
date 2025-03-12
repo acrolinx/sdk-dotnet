@@ -38,6 +38,18 @@ namespace Acrolinx.Net.Tests
             return new AcrolinxEndpoint(AcrolinxUrl, _signature);
         }
 
+        public string Signature
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_signature))
+                {
+                    Trace.WriteLine("Set the Acrolinx signature");
+                }
+                return _signature;
+            }
+        }
+
         public string SsoToken
         {
             get
@@ -57,7 +69,7 @@ namespace Acrolinx.Net.Tests
             {
                 if (string.IsNullOrWhiteSpace(_acrolinxUrl))
                 {
-                    Trace.WriteLine("Set the acrolinx url");
+                    Trace.WriteLine("Set the Acrolinx url");
                 }
                 return _acrolinxUrl;
             }
@@ -69,7 +81,7 @@ namespace Acrolinx.Net.Tests
             {
                 if (string.IsNullOrWhiteSpace(_username))
                 {
-                    Trace.WriteLine("Set the acrolinx use name");
+                    Trace.WriteLine("Set the Acrolinx username");
                 }
                 return _username;
             }

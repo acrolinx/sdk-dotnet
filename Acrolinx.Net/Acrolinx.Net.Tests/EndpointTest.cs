@@ -283,7 +283,31 @@ namespace Acrolinx.Net.Tests
             Assert.IsNotNull(checkResult.Issues[0].GuidanceHtml);
             Assert.IsNotNull(checkResult.Issues[0].GoalId);
             Assert.IsNotNull(checkResult.Issues[0].Suggestions);
+        }
 
+        [TestMethod]
+        public async Task TestGetAccessToken_WithEndpointUrlVariations()
+        {
+            var acrolinxEndpointUrl = TestEnvironment.AcrolinxUrl;
+            var urlVariations = new List<string>
+            {
+                acrolinxEndpointUrl.TrimEnd('/'),
+                acrolinxEndpointUrl.TrimEnd('/') + "/",
+                acrolinxEndpointUrl.TrimEnd('/') + "//"
+            };
+
+            Assert.IsTrue(urlVariations.Count == 3);
+            Assert.IsFalse(urlVariations[0].EndsWith("/"));
+            Assert.IsTrue(urlVariations[1].EndsWith("/"));
+            Assert.IsTrue(urlVariations[2].EndsWith("//"));
+
+            foreach (var url in urlVariations)
+            {
+                var endpoint = new AcrolinxEndpoint(url, TestEnvironment.Signature);
+                var accessToken = await endpoint.SignInWithSSO(TestEnvironment.SsoToken, TestEnvironment.Username);
+
+                Assert.IsNotNull(accessToken);
+            }
         }
 
         private async Task<CheckResponse> SubmitCheck(AccessToken accessToken, CheckRequest checkRequest)
