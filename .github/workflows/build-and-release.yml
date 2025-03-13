@@ -49,15 +49,6 @@ jobs:
         run: |
           '& dotnet test Acrolinx.Net\Acrolinx.Net.Tests\bin\Release\net9.0\Acrolinx.Net.Tests.dll -l:trx;LogFileName=Acrolinx.Net\Acrolinx.Net\bin\Release\testResult.xml'
 
-      - name: Setup Certificate
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          SM_CLIENT_CERT_FILE_B64: ${{ secrets.SM_CLIENT_CERT_FILE_B64 }}
-        run: |
-          $env:SM_CLIENT_CERT_FILE_B64 > input.b64
-          & "C:\Windows\System32\certutil.exe" -decode input.b64 $env:SM_CLIENT_CERT_FILE
-        shell: pwsh
-
       - name: Set variables for code signing
         id: variables
         if: startsWith(github.ref, 'refs/tags/')
@@ -70,6 +61,15 @@ jobs:
           echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH 
           echo "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools" >> $GITHUB_PATH
         shell: bash
+
+      - name: Setup Certificate
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          SM_CLIENT_CERT_FILE_B64: ${{ secrets.SM_CLIENT_CERT_FILE_B64 }}
+        run: |
+          $env:SM_CLIENT_CERT_FILE_B64 > input.b64
+          & "C:\Windows\System32\certutil.exe" -decode input.b64 $env:SM_CLIENT_CERT_FILE
+        shell: pwsh
 
       - name: Setup SSM KSP on windows latest
         if: startsWith(github.ref, 'refs/tags/')
