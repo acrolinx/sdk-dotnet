@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+using System.Net;
+using System.Net.Http.Headers;
 using Acrolinx.Net.Acrolinx.Net;
 using Acrolinx.Net.Check;
 using Acrolinx.Net.Exceptions;
 using Acrolinx.Net.Utils;
 using Moq;
+using Moq.Protected;
 
 namespace Acrolinx.Net.Tests
 {
@@ -308,6 +311,52 @@ namespace Acrolinx.Net.Tests
 
                 Assert.IsNotNull(accessToken);
             }
+        }
+
+        [TestMethod]
+        public async Task TestSignInWithSSO_EncodesHeadersCorrectly()
+        {
+            // Arrange the Mock
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("{\"data\": {\"accessToken\": \"testToken\"}, \"links\": {\"self\": \"https://acrolinx.com\"}}"),
+                })
+                .Verifiable();
+
+            // Create the Acrolinx Endpoint with the Mock
+            var httpClient = new HttpClient(handlerMock.Object);
+            var endpoint = new AcrolinxEndpoint(TestEnvironment.AcrolinxUrl, TestEnvironment.Signature, httpClient);
+
+            var username = "abcd äöüß";
+            var genericToken = "!#$%&<=>@?";
+
+            // Sign in using SSO
+            await endpoint.SignInWithSSO(genericToken, username);
+
+            // Assert the result
+            handlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Once(),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.Method == HttpMethod.Post
+                    && req.Headers.Contains("username")
+                    && req.Headers.Contains("password")
+                    && UrlDecodeHeader(req.Headers, "username") == username
+                    && UrlDecodeHeader(req.Headers, "password") == genericToken),
+                ItExpr.IsAny<CancellationToken>());
+        }
+
+        private string UrlDecodeHeader(HttpRequestHeaders headers, string headerValue)
+        {
+            return Uri.UnescapeDataString(headers.GetValues(headerValue).First());
         }
 
         private async Task<CheckResponse> SubmitCheck(AccessToken accessToken, CheckRequest checkRequest)
