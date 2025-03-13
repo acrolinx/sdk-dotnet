@@ -44,10 +44,11 @@ namespace Acrolinx.Net
         private string clientVersion = "";
         private HttpClient client = null;
 
-        public AcrolinxEndpoint(string acrolinxUrl, string clientSignature)
+        public AcrolinxEndpoint(string acrolinxUrl, string clientSignature, HttpClient client = null)
         {
             this.acrolinxUrl = acrolinxUrl;
             this.clientSignature = clientSignature;
+            this.client = client ?? new HttpClient();
             try
             {
                 this.clientVersion = Assembly.GetEntryAssembly()?.GetName()?.Version?.ToString();
@@ -141,8 +142,8 @@ namespace Acrolinx.Net
                 var obj = await FetchDataFromApiPath<SignInResponse>("auth/sign-ins", HttpMethod.Post,
                     null,
                     new Dictionary<string, string>(){
-                    { "username", username },
-                    { "password", genericToken }
+                    { "username", UrlEncode(username) },
+                    { "password", UrlEncode(genericToken) }
                     },
                     null);
                 if (obj.Links.ContainsKey("poll"))
@@ -156,6 +157,12 @@ namespace Acrolinx.Net
                 throw new SsoFailedException(e.Message, e);
             }
         }
+
+        private string UrlEncode(string value)
+        {
+            return Uri.EscapeDataString(value);
+        }
+
         public async Task<AccessToken> SignInInteractive(OpenUrl openUrl)
         {
             return await SignInInteractive(openUrl, null);
