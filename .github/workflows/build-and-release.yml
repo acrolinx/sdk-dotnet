@@ -30,7 +30,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8
+          dotnet-version: 9
 
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
@@ -89,7 +89,7 @@ jobs:
           DIGICERT_CERTIFICATE_FINGERPRINT: ${{ secrets.DIGICERT_CERTIFICATE_FINGERPRINT }}
         run: |
           Write-Host "Signing the binaries using signtool.exe"
-          $frameworks = @("net8.0", ".net9.0", "net472")
+          $frameworks = @("net8.0", "net9.0", "net472")
           foreach ($framework in $frameworks) {
             Write-Host "Signing $env:BINARYDIR\$framework\Acrolinx.Net.dll"
             & signtool.exe sign /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 /sha1 $env:DIGICERT_CERTIFICATE_FINGERPRINT "$env:BINARYDIR\$framework\Acrolinx.Net.dll"
