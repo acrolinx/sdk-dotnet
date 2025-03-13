@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0;net472</TargetFrameworks>
     <OutputType>Library</OutputType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/acrolinx/sdk-dotnet</PackageProjectUrl>
@@ -16,7 +16,7 @@
     <SignAssembly>False</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <None Pack="true" PackagePath="content/images/" Update="nugetIcon.png" />
+    <None Pack="true" PackagePath="content/images/" Include="nugetIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Client">
