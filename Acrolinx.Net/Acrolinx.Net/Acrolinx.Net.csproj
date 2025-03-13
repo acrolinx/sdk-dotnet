@@ -16,7 +16,7 @@
     <SignAssembly>False</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <None Pack="true" PackagePath="content/images/" Update="nugetIcon.png" />
+    <None Pack="true" PackagePath="content/images/" Include="nugetIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Client">
