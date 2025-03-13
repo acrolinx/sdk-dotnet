@@ -133,7 +133,7 @@ jobs:
         with:
           files: |
             *.nupkg
-            Acrolinx.Net/Acrolinx.Net/bin/Release/netstandard2.0/
+            Acrolinx.Net/Acrolinx.Net/bin/Release/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -146,4 +146,4 @@ jobs:
           name: dotNetSDK_Artifacts
           path: |
             *.nupkg
-            Acrolinx.Net/Acrolinx.Net/bin/Release/netstandard2.0/
+            Acrolinx.Net/Acrolinx.Net/bin/Release/
